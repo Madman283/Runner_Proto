@@ -846,11 +846,11 @@ PlayerSettings:
   apiCompatibilityLevel: 6
   activeInputHandler: 1
   windowsGamepadBackendHint: 0
-  cloudProjectId: 
+  cloudProjectId: 0935c502-d5e9-42ab-a6ce-7037b769f198
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: Hypercasual
-  organizationId: 
+  projectName: Runner_Proto
+  organizationId: figueroab4
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   playerDataPath: 
