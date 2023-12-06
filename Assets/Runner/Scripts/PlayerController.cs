@@ -49,6 +49,25 @@ namespace HyperCasual.Runner
         const float k_MinimumScale = 0.1f;
         static readonly string s_Speed = "Speed";
 
+        Player_action action_type = Player_action.NONE;
+
+        enum Player_action
+        {
+            NONE,
+            JUMP_UP,
+            JUMP_DOWN,
+            SLIDE
+        }
+
+        public float jump_force_up = 6;
+
+        public float jump_force_down = 8;
+
+        public float jump_peak_height = 10;
+
+        private float original_Y_start;
+        
+
         enum PlayerSpeedPreset
         {
             Slow,
@@ -62,6 +81,7 @@ namespace HyperCasual.Runner
         bool m_HasInput;
         float m_MaxXPosition;
         float m_XPos;
+        float m_YPos;
         float m_ZPos;
         float m_TargetPosition;
         float m_Speed;
@@ -120,11 +140,13 @@ namespace HyperCasual.Runner
         /// </summary>
         public void Initialize()
         {
+            original_Y_start = this.transform.position.y;
             m_Transform = transform;
             m_StartPosition = m_Transform.position;
             m_DefaultScale = m_Transform.localScale;
             m_Scale = m_DefaultScale;
             m_TargetScale = m_Scale;
+            
 
             if (m_SkinnedMeshRenderer != null)
             {
@@ -206,11 +228,20 @@ namespace HyperCasual.Runner
         /// <summary>
         /// Sets the target X position of the player
         /// </summary>
-        public void SetDeltaPosition(float normalizedDeltaPosition)
+        public void SetDeltaPosition(float normalizedDeltaPosition, float jump_or_slide)
         {
             if (m_MaxXPosition == 0.0f)
             {
                 Debug.LogError("Player cannot move because SetMaxXPosition has never been called or Level Width is 0. If you are in the LevelEditor scene, ensure a level has been loaded in the LevelEditor Window!");
+            }
+
+            if (jump_or_slide > 0 && action_type == Player_action.NONE)
+            {
+                action_type = Player_action.JUMP_UP;
+            }
+            else if (jump_or_slide < 0 && action_type == Player_action.NONE)
+            {
+                Debug.Log("slide");
             }
 
             float fullWidth = m_MaxXPosition * 2.0f;
@@ -255,9 +286,63 @@ namespace HyperCasual.Runner
             ResetScale();
         }
 
+        public void Jump_up_player()
+        {
+
+
+            if (this.transform.position.y >= original_Y_start + (jump_peak_height - 1))
+            {
+                action_type = Player_action.JUMP_DOWN;
+            }
+            else
+            {
+                float new_Y_postiontion_target = Mathf.Lerp(m_YPos, jump_peak_height, jump_force_up * Time.deltaTime);
+                float new_y_position_difference = new_Y_postiontion_target - m_YPos;
+
+
+                m_YPos += new_y_position_difference;
+            }
+        }
+
+        public void Jump_down_player()
+        {
+            if (this.transform.position.y <= (original_Y_start + 1))
+            {
+                action_type = Player_action.NONE;
+            }
+            else
+            {
+                float new_Y_postiontion_target = Mathf.Lerp(m_YPos, original_Y_start, jump_force_down * Time.deltaTime);
+                float new_y_position_difference = new_Y_postiontion_target - m_YPos;
+
+
+                m_YPos += new_y_position_difference;
+            }
+        }
+
+        public void Slide_player()
+        {
+
+        }
+
+
         void Update()
         {
             float deltaTime = Time.deltaTime;
+
+            //jump
+            if(action_type == Player_action.JUMP_UP)
+            {
+                Jump_up_player();
+            }
+            else if(action_type == Player_action.JUMP_DOWN)
+            {
+                Jump_down_player();
+            }
+            else if (action_type == Player_action.NONE)
+            {
+                m_YPos = m_Transform.position.y;
+            }
 
             // Update Scale
 
@@ -300,7 +385,7 @@ namespace HyperCasual.Runner
                 m_XPos += newPositionDifference;
             }
 
-            m_Transform.position = new Vector3(m_XPos, m_Transform.position.y, m_ZPos);
+            m_Transform.position = new Vector3(m_XPos, /*m_Transform.position.y*/ m_YPos, m_ZPos);
 
             if (m_Animator != null && deltaTime > 0.0f)
             {

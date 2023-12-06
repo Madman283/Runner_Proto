@@ -25,6 +25,9 @@ namespace HyperCasual.Runner
         Vector3 m_InputPosition;
         Vector3 m_PreviousInputPosition;
 
+        float dis_from = 10;//distrance of movment for a jump/slide action to happen
+
+
         void Awake()
         {
             if (s_Instance != null && s_Instance != this)
@@ -89,7 +92,23 @@ namespace HyperCasual.Runner
             if (m_HasInput)
             {
                 float normalizedDeltaPosition = (m_InputPosition.x - m_PreviousInputPosition.x) / Screen.width * m_InputSensitivity;
-                PlayerController.Instance.SetDeltaPosition(normalizedDeltaPosition);
+
+                float jump_or_slide;
+
+                if (m_InputPosition.y > m_PreviousInputPosition.y + dis_from) // jump
+                {
+                    jump_or_slide = 1;
+                }
+                else if (m_InputPosition.y < m_PreviousInputPosition.y - dis_from) //slide
+                {
+                    jump_or_slide = -1;
+                }
+                else
+                {
+                    jump_or_slide = 0;
+                }
+
+                PlayerController.Instance.SetDeltaPosition(normalizedDeltaPosition, jump_or_slide);
             }
             else
             {
