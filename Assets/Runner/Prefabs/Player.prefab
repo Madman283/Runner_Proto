@@ -56,6 +56,11 @@ MonoBehaviour:
   m_HorizontalSpeedFactor: 0.8
   m_ScaleVelocity: 2
   m_AutoMoveForward: 1
+  distance_betwean_lanes: 2
+  jump_force_up: 6
+  jump_force_down: 8
+  jump_peak_height: 10
+  slide_distance: 0
 --- !u!136 &8475646709700121470
 CapsuleCollider:
   m_ObjectHideFlags: 0

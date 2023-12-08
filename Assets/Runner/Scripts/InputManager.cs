@@ -111,11 +111,11 @@ namespace HyperCasual.Runner
                 }
 
 
-                if(m_InputPosition.x > m_PreviousInputPosition.x + dis_from * 2) //right
+                if(m_InputPosition.x > m_PreviousInputPosition.x + dis_from * 4) //right
                 {
                     left_or_right = 1;
                 }
-                else if(m_InputPosition.x < m_PreviousInputPosition.x - dis_from * 2) //left
+                else if(m_InputPosition.x < m_PreviousInputPosition.x - dis_from * 4) //left
                 {
                     left_or_right = -1;
                 }
