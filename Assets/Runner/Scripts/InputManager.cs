@@ -25,8 +25,8 @@ namespace HyperCasual.Runner
         Vector3 m_InputPosition;
         Vector3 m_PreviousInputPosition;
 
-        float dis_from = 10;//distrance of movment for a jump/slide action to happen
-
+        public float dis_from_sensitivity = 10;//distrance of movment for a jump/slide action to happen
+        public float sensi = 8; 
 
         void Awake()
         {
@@ -97,11 +97,11 @@ namespace HyperCasual.Runner
 
                 float left_or_right; //lane change
 
-                if (m_InputPosition.y > m_PreviousInputPosition.y + dis_from) // jump
+                if (m_InputPosition.y > m_PreviousInputPosition.y + dis_from_sensitivity) // jump
                 {
                     jump_or_slide = 1;
                 }
-                else if (m_InputPosition.y < m_PreviousInputPosition.y - dis_from) //slide
+                else if (m_InputPosition.y < m_PreviousInputPosition.y - dis_from_sensitivity) //slide
                 {
                     jump_or_slide = -1;
                 }
@@ -111,11 +111,11 @@ namespace HyperCasual.Runner
                 }
 
 
-                if(m_InputPosition.x > m_PreviousInputPosition.x + dis_from * 4) //right
+                if(m_InputPosition.x > m_PreviousInputPosition.x + dis_from_sensitivity * sensi) //right
                 {
                     left_or_right = 1;
                 }
-                else if(m_InputPosition.x < m_PreviousInputPosition.x - dis_from * 4) //left
+                else if(m_InputPosition.x < m_PreviousInputPosition.x - dis_from_sensitivity * sensi) //left
                 {
                     left_or_right = -1;
                 }
