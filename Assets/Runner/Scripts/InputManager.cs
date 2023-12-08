@@ -91,9 +91,11 @@ namespace HyperCasual.Runner
 
             if (m_HasInput)
             {
-                float normalizedDeltaPosition = (m_InputPosition.x - m_PreviousInputPosition.x) / Screen.width * m_InputSensitivity;
+                //float normalizedDeltaPosition = (m_InputPosition.x - m_PreviousInputPosition.x) / Screen.width * m_InputSensitivity;
 
                 float jump_or_slide;
+
+                float left_or_right; //lane change
 
                 if (m_InputPosition.y > m_PreviousInputPosition.y + dis_from) // jump
                 {
@@ -108,7 +110,21 @@ namespace HyperCasual.Runner
                     jump_or_slide = 0;
                 }
 
-                PlayerController.Instance.SetDeltaPosition(normalizedDeltaPosition, jump_or_slide);
+
+                if(m_InputPosition.x > m_PreviousInputPosition.x + dis_from * 2) //right
+                {
+                    left_or_right = 1;
+                }
+                else if(m_InputPosition.x < m_PreviousInputPosition.x - dis_from * 2) //left
+                {
+                    left_or_right = -1;
+                }
+                else
+                {
+                    left_or_right = 0;
+                }
+
+                PlayerController.Instance.SetDeltaPosition(/*normalizedDeltaPosition*/left_or_right, jump_or_slide);
             }
             else
             {

@@ -59,6 +59,23 @@ namespace HyperCasual.Runner
             SLIDE
         }
 
+        Player_lane_change change_lane = Player_lane_change.NONE;
+
+        enum Player_lane_change
+        {
+            NONE,
+            RIGHT,
+            LEFT
+        }
+
+        private float[] running_lanes = { 0, 1, 2, 3, 4 };
+
+        public float distance_betwean_lanes = 1;
+
+        protected float start_lane;
+
+        private int current_lane = 2;
+
         public float jump_force_up = 6;
 
         public float jump_force_down = 8;
@@ -66,7 +83,14 @@ namespace HyperCasual.Runner
         public float jump_peak_height = 10;
 
         private float original_Y_start;
-        
+
+        private float slide_last_position;
+
+        public float slide_distance; //distance of the slide
+
+        private Vector3 original_collieder_size; 
+
+
 
         enum PlayerSpeedPreset
         {
@@ -135,11 +159,22 @@ namespace HyperCasual.Runner
             Initialize();
         }
 
+        public void Lane_set_up()
+        {
+            running_lanes[3] = start_lane + distance_betwean_lanes;
+            running_lanes[4] = start_lane + (distance_betwean_lanes * 2);
+            running_lanes[1] = start_lane - distance_betwean_lanes;
+            running_lanes[0] = start_lane - (distance_betwean_lanes * 2);
+        }
+
         /// <summary>
         /// Set up all necessary values for the PlayerController.
         /// </summary>
         public void Initialize()
         {
+            start_lane = this.transform.position.x;
+            running_lanes[2] = start_lane;
+            current_lane = 2;
             original_Y_start = this.transform.position.y;
             m_Transform = transform;
             m_StartPosition = m_Transform.position;
@@ -147,6 +182,8 @@ namespace HyperCasual.Runner
             m_Scale = m_DefaultScale;
             m_TargetScale = m_Scale;
             
+            
+            Lane_set_up();
 
             if (m_SkinnedMeshRenderer != null)
             {
@@ -242,12 +279,26 @@ namespace HyperCasual.Runner
             else if (jump_or_slide < 0 && action_type == Player_action.NONE)
             {
                 Debug.Log("slide");
+                //slide_last_position = this.transform.position.z;
+                //action_type = Player_action.SLIDE;
             }
 
-            float fullWidth = m_MaxXPosition * 2.0f;
+            if(normalizedDeltaPosition < 0 && change_lane == Player_lane_change.NONE && current_lane < 4)
+            {
+                //Debug.Log(current_lane + " R");
+                change_lane = Player_lane_change.RIGHT;
+            }
+            else if(normalizedDeltaPosition > 0 && change_lane == Player_lane_change.NONE && current_lane > 0)
+            {
+                //Debug.Log(current_lane + " L");
+                change_lane = Player_lane_change.LEFT;
+            }
+            
+            //free movement
+            /*float fullWidth = m_MaxXPosition * 2.0f;
             m_TargetPosition = m_TargetPosition + fullWidth * normalizedDeltaPosition;
             m_TargetPosition = Mathf.Clamp(m_TargetPosition, -m_MaxXPosition, m_MaxXPosition);
-            m_HasInput = true;
+            m_HasInput = true;*/
         }
 
         /// <summary>
@@ -320,9 +371,50 @@ namespace HyperCasual.Runner
             }
         }
 
-        public void Slide_player()
+        public void Slide_player_start()
         {
+            
+            if(this.transform.position.z > slide_distance + slide_last_position )
+            {
 
+            }
+            else
+            {
+
+            }
+        }
+
+        public void left(int lane)
+        {
+            if (this.transform.position.x <= (running_lanes[lane] + 1))
+            {
+                
+                current_lane = current_lane - 1;
+                change_lane = Player_lane_change.NONE;
+            }
+            else
+            {
+                float new_x_positiontarget = Mathf.Lerp(m_XPos, running_lanes[lane], Speed * Time.deltaTime);
+                float new_x_positiondifference = new_x_positiontarget - m_XPos;
+
+                m_XPos += new_x_positiondifference;
+            }
+        }
+
+        public void right(int lane)
+        {
+            if (this.transform.position.x >= (running_lanes[lane] - 1))
+            {
+                current_lane = current_lane + 1;
+                change_lane = Player_lane_change.NONE;
+            }
+            else
+            {
+                float new_x_positiontarget = Mathf.Lerp(m_XPos, running_lanes[lane], Speed * Time.deltaTime);
+                float new_x_positiondifference = new_x_positiontarget - m_XPos;
+
+                m_XPos += new_x_positiondifference;
+            }
         }
 
 
@@ -339,9 +431,29 @@ namespace HyperCasual.Runner
             {
                 Jump_down_player();
             }
+            else if(action_type == Player_action.SLIDE)
+            {
+                Slide_player_start();
+            }
             else if (action_type == Player_action.NONE)
             {
                 m_YPos = m_Transform.position.y;
+            }
+
+            //jump
+            if (change_lane == Player_lane_change.RIGHT)
+            {
+                right(current_lane + 1);
+                //Debug.Log(current_lane + " R");
+            }
+            else if (change_lane == Player_lane_change.LEFT)
+            {
+                left(current_lane - 1);
+                //Debug.Log(current_lane + " L");
+            }
+            else if (change_lane == Player_lane_change.NONE)
+            {
+                m_XPos = running_lanes[current_lane];
             }
 
             // Update Scale
@@ -373,7 +485,9 @@ namespace HyperCasual.Runner
 
             m_ZPos += speed;
 
-            if (m_HasInput)
+
+            //this is used for the more free movemnt stile (non-lane change)
+            /*if (m_HasInput)
             {
                 float horizontalSpeed = speed * m_HorizontalSpeedFactor;
 
@@ -383,7 +497,7 @@ namespace HyperCasual.Runner
                 newPositionDifference = Mathf.Clamp(newPositionDifference, -horizontalSpeed, horizontalSpeed);
 
                 m_XPos += newPositionDifference;
-            }
+            }*/
 
             m_Transform.position = new Vector3(m_XPos, /*m_Transform.position.y*/ m_YPos, m_ZPos);
 
