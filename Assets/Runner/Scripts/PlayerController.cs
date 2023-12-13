@@ -16,6 +16,10 @@ namespace HyperCasual.Runner
         public static PlayerController Instance => s_Instance;
         static PlayerController s_Instance;
 
+        private CapsuleCollider player_collider;
+
+        private float original_player_collider_height;
+
         [SerializeField]
         Animator m_Animator;
 
@@ -67,6 +71,8 @@ namespace HyperCasual.Runner
             RIGHT,
             LEFT
         }
+
+        private float Switch_lanes_smoother = .01F;
 
         private float[] running_lanes = { 0, 1, 2, 3, 4 };
 
@@ -181,8 +187,10 @@ namespace HyperCasual.Runner
             m_DefaultScale = m_Transform.localScale;
             m_Scale = m_DefaultScale;
             m_TargetScale = m_Scale;
-            
-            
+
+            player_collider = this.GetComponent<CapsuleCollider>();
+            original_player_collider_height = player_collider.height;
+
             Lane_set_up();
 
             if (m_SkinnedMeshRenderer != null)
@@ -278,9 +286,9 @@ namespace HyperCasual.Runner
             }
             else if (jump_or_slide < 0 && action_type == Player_action.NONE)
             {
-                Debug.Log("slide");
-                //slide_last_position = this.transform.position.z;
-                //action_type = Player_action.SLIDE;
+                //Debug.Log("slide");
+                slide_last_position = this.transform.position.z;
+                action_type = Player_action.SLIDE;
             }
 
             if(normalizedDeltaPosition < 0 && change_lane == Player_lane_change.NONE && current_lane < 4)
@@ -376,17 +384,17 @@ namespace HyperCasual.Runner
             
             if(this.transform.position.z > slide_distance + slide_last_position )
             {
-
+                player_collider.height = original_player_collider_height;
             }
-            else
+            else if(player_collider.height >= original_player_collider_height - 1)
             {
-
+                player_collider.height = original_player_collider_height / 4;
             }
         }
 
         public void left(int lane)
         {
-            if (this.transform.position.x <= (running_lanes[lane] + 1))
+            if (this.transform.position.x <= (running_lanes[lane] + Switch_lanes_smoother))
             {
                 
                 current_lane = current_lane - 1;
@@ -403,7 +411,7 @@ namespace HyperCasual.Runner
 
         public void right(int lane)
         {
-            if (this.transform.position.x >= (running_lanes[lane] - 1))
+            if (this.transform.position.x >= (running_lanes[lane] - Switch_lanes_smoother))
             {
                 current_lane = current_lane + 1;
                 change_lane = Player_lane_change.NONE;
