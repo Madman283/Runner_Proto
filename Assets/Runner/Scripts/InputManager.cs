@@ -25,8 +25,8 @@ namespace HyperCasual.Runner
         Vector3 m_InputPosition;
         Vector3 m_PreviousInputPosition;
 
-        public float dis_from_sensitivity = 10;//distrance of movment for a jump/slide action to happen
-        public float sensi = 8; 
+        public float dis_from_sensitivity = 10;//distrance of movment for a jump/slide action to happen (suggest to set it lower than 6)
+        public float sensi = 8; //mulitplies the distance of movemtn on top of the dis_from_sensivtivity for the left and right movement
 
         void Awake()
         {

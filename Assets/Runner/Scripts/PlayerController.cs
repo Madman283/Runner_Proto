@@ -94,8 +94,13 @@ namespace HyperCasual.Runner
 
         public float slide_distance; //distance of the slide
 
-        private Vector3 original_collieder_size; 
+        private Vector3 original_collieder_size;
 
+        private float time_tracker = 0;
+
+        public float incrase_speed = 0;
+
+        public float time_betwean_speed_increasements = 0;
 
 
         enum PlayerSpeedPreset
@@ -209,6 +214,22 @@ namespace HyperCasual.Runner
         /// Returns the current default speed based on the currently
         /// selected PlayerSpeed preset.
         /// </summary>
+        /// 
+
+        public void Speed_increase_over_time()
+        {
+
+            if (time_tracker > time_betwean_speed_increasements)
+            {
+                time_tracker = 0;
+                m_TargetSpeed = m_TargetSpeed + incrase_speed;
+            }
+            else
+            {
+                time_tracker = time_tracker + 1;
+            }
+        }
+
         public float GetDefaultSpeed()
         {
             switch (m_PlayerSpeed)
@@ -471,6 +492,13 @@ namespace HyperCasual.Runner
                 m_Scale = Vector3.Lerp(m_Scale, m_TargetScale, deltaTime * m_ScaleVelocity);
                 m_Transform.localScale = m_Scale;
             }
+
+            //Speed incrase over a counting timer
+            if(time_betwean_speed_increasements > 0 && incrase_speed != 0)
+            {
+                Speed_increase_over_time();
+            }
+
 
             // Update Speed
 
