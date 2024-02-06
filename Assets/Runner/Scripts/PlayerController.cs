@@ -18,6 +18,10 @@ namespace HyperCasual.Runner
 
         private CapsuleCollider player_collider;
 
+
+        //adds points to the Score_tracker class
+        Score_tracker score;
+
         private float original_player_collider_height;
 
         [SerializeField]
@@ -223,6 +227,8 @@ namespace HyperCasual.Runner
             {
                 time_tracker = 0;
                 m_TargetSpeed = m_TargetSpeed + incrase_speed;
+
+                score.score_adding(m_TargetSpeed);
             }
             else
             {
