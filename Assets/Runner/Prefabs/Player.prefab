@@ -61,6 +61,8 @@ MonoBehaviour:
   jump_force_down: 8
   jump_peak_height: 10
   slide_distance: 0
+  incrase_speed: 0
+  time_betwean_speed_increasements: 0
 --- !u!136 &8475646709700121470
 CapsuleCollider:
   m_ObjectHideFlags: 0
