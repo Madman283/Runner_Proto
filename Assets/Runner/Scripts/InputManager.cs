@@ -25,6 +25,8 @@ namespace HyperCasual.Runner
         Vector3 m_InputPosition;
         Vector3 m_PreviousInputPosition;
 
+        bool action_completed = false;
+
         public float dis_from_sensitivity = 10;//distrance of movment for a jump/slide action to happen (suggest to set it lower than 6)
         public float sensi = 8; //mulitplies the distance of movemtn on top of the dis_from_sensivtivity for the left and right movement
 
@@ -69,6 +71,7 @@ namespace HyperCasual.Runner
             }
             else
             {
+                action_completed = false;
                 m_HasInput = false;
             }
 #else
@@ -89,7 +92,7 @@ namespace HyperCasual.Runner
             }
 #endif
 
-            if (m_HasInput)
+            if (m_HasInput && action_completed == false)
             {
                 //float normalizedDeltaPosition = (m_InputPosition.x - m_PreviousInputPosition.x) / Screen.width * m_InputSensitivity;
 
@@ -100,10 +103,12 @@ namespace HyperCasual.Runner
                 if (m_InputPosition.y > m_PreviousInputPosition.y + dis_from_sensitivity) // jump
                 {
                     jump_or_slide = 1;
+                    action_completed = true;
                 }
                 else if (m_InputPosition.y < m_PreviousInputPosition.y - dis_from_sensitivity) //slide
                 {
                     jump_or_slide = -1;
+                    action_completed = true;
                 }
                 else
                 {
@@ -114,14 +119,17 @@ namespace HyperCasual.Runner
                 if(m_InputPosition.x > m_PreviousInputPosition.x + dis_from_sensitivity * sensi) //right
                 {
                     left_or_right = 1;
+                    action_completed = true;
                 }
                 else if(m_InputPosition.x < m_PreviousInputPosition.x - dis_from_sensitivity * sensi) //left
                 {
                     left_or_right = -1;
+                    action_completed = true;
                 }
                 else
                 {
                     left_or_right = 0;
+                    
                 }
 
                 PlayerController.Instance.SetDeltaPosition(/*normalizedDeltaPosition*/left_or_right, jump_or_slide);
